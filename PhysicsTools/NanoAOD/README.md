@@ -33,7 +33,7 @@ if (vectorSize > 1 ){
     }
 }
 ```
-- l. 330: (description of branch)
+- l. 295 and 330: (description of branch)
 ```C++
 outPS->addColumn<float>("", wPS, vectorSize > 1 ? "PS weights (w_var); [0] and [1] are central ME weight value and replica; [2] is ISR=0.707 FSR=1; [3] is ISR=1 FSR=0.707; [3] is ISR=1.414 FSR=1; [5] is ISR=1 FSR=1.414; [6] is ISR=0.5 FSR=1; [7] is ISR=1 FSR=0.5; [8] is ISR=2 FSR=1; [9] is ISR=1 FSR=2; [10] is ISR=0.25 FSR=1; [11] is ISR=1 FSR=0.25; [12] is ISR=4 FSR=1; [13] is ISR=1 FSR=4; [14]-[45] are decorrelated PS weights" : "dummy PS weight (1.0) " , nanoaod::FlatTable::FloatColumn, lheWeightPrecision_);
 ```
