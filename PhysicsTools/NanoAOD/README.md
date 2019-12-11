@@ -4,6 +4,7 @@ mainly based on the instructions given in https://twiki.cern.ch/twiki/bin/view/C
 ```
 export SCRAM_ARCH=slc6_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
+cmsrel CMSSW_10_2_18
 cd CMSSW_10_2_18/src/
 cmsenv
 git cms-merge-topic cms-nanoAOD:master-102X
