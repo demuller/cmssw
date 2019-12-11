@@ -4,14 +4,39 @@ mainly based on the instructions given in https://twiki.cern.ch/twiki/bin/view/C
 ```
 export SCRAM_ARCH=slc6_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-cmsrel CMSSW_10_2_18
-cd src/
+cd CMSSW_10_2_18/src/
 cmsenv
 git cms-merge-topic cms-nanoAOD:master-102X
 git checkout -b nanoAOD cms-nanoAOD/master-102X
 git-cms-addpkg PhysicsTools/NanoAOD
 ```
-before compiling it, modify the file `PhysicsTools/NanoAOD/python/nano_cff.py` (i.e. remove PDF4LHC from the list of preferred PDF sets)
+before compiling it, modify
+- the file `PhysicsTools/NanoAOD/python/nano_cff.py` (i.e. remove PDF4LHC from the list of preferred PDF sets)
+- the file `PhysicsTools/NanoAOD/plugins/GenWeightsTableProducer.cc`:
+ - l. 286-292:
+```C++
+int vectorSize = genProd.weights().size(); // this number should be 14 (2+12) or 46 (2+12+32)
+std::vector<double> wPS(vectorSize, 1);
+if (vectorSize > 1 ) {
+    for (int i=0; i<vectorSize; i++){
+        wPS[i] = genProd.weights()[i]; // save all PS weights
+    }
+}
+```
+- l. 322-327:
+```C++
+std::vector<double> wPS(vectorSize, 1);
+if (vectorSize > 1 ){
+    for (int i=0; i<vectorSize; i++){
+        wPS[i] = genProd.weights()[i];
+    }
+}
+```
+- l. 330: (description of branch)
+```C++
+outPS->addColumn<float>("", wPS, vectorSize > 1 ? "PS weights (w_var); [0] and [1] are central ME weight value and replica; [2] is ISR=0.707 FSR=1; [3] is ISR=1 FSR=0.707; [3] is ISR=1.414 FSR=1; [5] is ISR=1 FSR=1.414; [6] is ISR=0.5 FSR=1; [7] is ISR=1 FSR=0.5; [8] is ISR=2 FSR=1; [9] is ISR=1 FSR=2; [10] is ISR=0.25 FSR=1; [11] is ISR=1 FSR=0.25; [12] is ISR=4 FSR=1; [13] is ISR=1 FSR=4; [14]-[45] are decorrelated PS weights" : "dummy PS weight (1.0) " , nanoaod::FlatTable::FloatColumn, lheWeightPrecision_);
+```
+Compile it:
 ```
 scram b -j 8
 ```
