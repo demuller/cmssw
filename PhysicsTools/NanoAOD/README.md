@@ -64,7 +64,6 @@ cmsDriver.py step1 --filein "dbs:/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/
 2. Modify it accordingly to your CMSSW version and replace `--eventcontent NANOEDMAODSIM` by `--eventcontent NANOAODSIM` in the cmsDriver command
 3. You can run it locally with `cmsRun TOP-RunIIAutumn18NanoAODv5-00207_1_cfg.py` or submit it via crab, an example for a crab config is given in `PhysicsTools/nanoAOD/test/crab_tw_antitop_ext1.py` with the corresponding PSet config file `PhysicsTools/nanoAOD/test/nano_cfg.py`
 4. Important: make sure to set the following variable in the OutputModule section of the PSet config: `fakeNameForCrab =cms.untracked.bool(True),`
-5. You can further process the publicated private nanoAOD files as shown in the napalm framework: `trees/test/crab/priv_nAODv5/`
 
 ## Troubleshooting
 
