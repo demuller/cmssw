@@ -9,7 +9,7 @@ cd src/
 cmsenv
 git cms-merge-topic cms-nanoAOD:master-102X
 git checkout -b nanoAOD cms-nanoAOD/master-102X
-git-cms-addpkg PhysicsTools/nanoAOD
+git-cms-addpkg PhysicsTools/NanoAOD
 ```
 before compiling it, modify the file `PhysicsTools/NanoAOD/python/nano_cff.py` (i.e. remove PDF4LHC from the list of preferred PDF sets)
 ```
