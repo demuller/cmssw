@@ -26,6 +26,7 @@ if (vectorSize > 1 ) {
 ```
 - l. 322-327:
 ```C++
+int vectorSize = genProd.weights().size();
 std::vector<double> wPS(vectorSize, 1);
 if (vectorSize > 1 ){
     for (int i=0; i<vectorSize; i++){
