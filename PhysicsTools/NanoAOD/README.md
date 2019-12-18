@@ -36,6 +36,10 @@ Update the following parameters in crabSubmit.py:
 - `config.Site.storageSite`: your storage element
 - `config.Data.outLFNDirBase`: path of your storage element
 - `config.Data.inputDataset`: miniAOD to be preocessed
+```
+source /cvmfs/cms.cern.ch/crab3/crab.sh
+crab submit
+```
 
 ## Troubleshooting
 
