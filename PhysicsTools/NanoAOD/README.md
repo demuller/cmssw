@@ -68,6 +68,24 @@ TOP-RunIIAutumn18NanoAODv5-00207_1_cfg.py)
 4. You can run this file locally with `cmsRun TOP-RunIIAutumn18NanoAODv5-00207_1_cfg.py` or submit it via crab, an example for a crab config is given in `PhysicsTools/nanoAOD/test/crab18_tw_antitop_ext1.py` with the corresponding PSet config file `PhysicsTools/nanoAOD/test/nano18_cfg.py` (note that a different file needs to be used for 2017: `PhysicsTools/nanoAOD/test/nano17_cfg.py`)
 5. Important: make sure to set the following variable in the OutputModule section of the PSet config: `fakeNameForCrab =cms.untracked.bool(True),`
 
+## For CRAB submission
+
+```bash
+cd <PATH_TO_CMSSW>/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/test
+cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/GenWeightsTableProducer.cc <PATH_TO_CMSSW>/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/plugins/
+
+scram b -j 8
+
+cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/nano_cff.py <PATH_TO_CMSSW>/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/python/
+cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/nano*_cfg.py .
+cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/crabSubmit.py .
+```
+Update the following parameters in crabSubmit.py:
+- `config.General.requestName`: name for your local directory
+- `config.JobType.psetName` and `config.Data.outputDatasetTag` (X=6, 7 or 8 but the same in both entries)
+- `config.Site.storageSite`: your storage element
+- `config.Data.outLFNDirBase`: path of your storage element
+
 ## Troubleshooting
 
 In case you accidentally published a dataset twice under the same publication name, one can invalidate specific files of the dataset: https://twiki.cern.ch/twiki/bin/view/CMSPublic/Crab3DataHandling#Changing_a_dataset_or_file_statu
