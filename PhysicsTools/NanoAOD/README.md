@@ -2,6 +2,8 @@
 
 mainly based on the instructions given in https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#How_to_check_out_the_code_and_pr
 ```
+mkdir submitTopNanoAOD/
+cd submitTopNanoAOD/
 export SCRAM_ARCH=slc6_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 cmsrel CMSSW_10_2_18
@@ -11,72 +13,20 @@ git cms-merge-topic cms-nanoAOD:master-102X
 git checkout -b nanoAOD cms-nanoAOD/master-102X
 git-cms-addpkg PhysicsTools/NanoAOD
 ```
-before compiling it, modify
-- the file `PhysicsTools/NanoAOD/python/nano_cff.py` (i.e. remove PDF4LHC from the list of preferred PDF sets)
-- the file `PhysicsTools/NanoAOD/plugins/GenWeightsTableProducer.cc`:
- - l. 286-292:
-```C++
-int vectorSize = genProd.weights().size(); // this number should be 14 (2+12) or 46 (2+12+32)
-std::vector<double> wPS(vectorSize, 1);
-if (vectorSize > 1 ) {
-    for (int i=0; i<vectorSize; i++){
-        wPS[i] = genProd.weights()[i]; // save all PS weights
-    }
-}
+Update the following files to get the desired info for PDF and PS weights (more info about the modifications done here: `afs/cern.ch/work/m/mullerd/public/priv_nAOD/modifications.txt`):
 ```
-- l. 322-327:
-```C++
-int vectorSize = genProd.weights().size();
-std::vector<double> wPS(vectorSize, 1);
-if (vectorSize > 1 ){
-    for (int i=0; i<vectorSize; i++){
-        wPS[i] = genProd.weights()[i];
-    }
-}
-```
-- l. 295 and 330: (description of branch)
-```C++
-outPS->addColumn<float>("", wPS, vectorSize > 1 ? "PS weights (w_var); [0] and [1] are central ME weight value and replica; [2] is ISR=0.707 FSR=1; [3] is ISR=1 FSR=0.707; [3] is ISR=1.414 FSR=1; [5] is ISR=1 FSR=1.414; [6] is ISR=0.5 FSR=1; [7] is ISR=1 FSR=0.5; [8] is ISR=2 FSR=1; [9] is ISR=1 FSR=2; [10] is ISR=0.25 FSR=1; [11] is ISR=1 FSR=0.25; [12] is ISR=4 FSR=1; [13] is ISR=1 FSR=4; [14]-[45] are decorrelated PS weights" : "dummy PS weight (1.0) " , nanoaod::FlatTable::FloatColumn, lheWeightPrecision_);
+cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/GenWeightsTableProducer.cc ~/submitTopNanoAOD/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/plugins/
+cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/nano_cff.py ~/submitTopNanoAOD/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/python/
 ```
 Compile it:
 ```
 scram b -j 8
 ```
 
-## Getting the setup config from the official nanoAOD campaign
-
-1. Go to the MCM pdmv web page and search for a prep id of a nanoAOD sample which you want to reproduce privately from MiniAOD and get the setup command, e.g.: https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/TOP-RunIIAutumn18NanoAODv5-00207
-```bash
-#!/bin/bash
-export SCRAM_ARCH=slc6_amd64_gcc700
-source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_10_2_15/src ] ; then 
- echo release CMSSW_10_2_15 already exists
-else
-scram p CMSSW CMSSW_10_2_15
-fi
-cd CMSSW_10_2_15/src
-eval `scram runtime -sh`
-scram b
-cd ../../
-cmsDriver.py step1 --filein "dbs:/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext3-v2/MINIAODSIM" --fileout file:TOP-RunIIAutumn18NanoAODv5-00207.root --mc --eventcontent NANOEDMAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v19 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --python_filename TOP-RunIIAutumn18NanoAODv5-00207_1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 10000 || exit $? ;
-```
-
-2. Modify it accordingly to your CMSSW version and replace `--eventcontent NANOEDMAODSIM` by `--eventcontent NANOAODSIM` in the cmsDriver command
-3. By executing this file via `. TOP-RunIIAutumn18NanoAODv5-00207.sh`, one obtains a python config file (in this case, 
-TOP-RunIIAutumn18NanoAODv5-00207_1_cfg.py)
-4. You can run this file locally with `cmsRun TOP-RunIIAutumn18NanoAODv5-00207_1_cfg.py` or submit it via crab, an example for a crab config is given in `PhysicsTools/nanoAOD/test/crab18_tw_antitop_ext1.py` with the corresponding PSet config file `PhysicsTools/nanoAOD/test/nano18_cfg.py` (note that a different file needs to be used for 2017: `PhysicsTools/nanoAOD/test/nano17_cfg.py`)
-5. Important: make sure to set the following variable in the OutputModule section of the PSet config: `fakeNameForCrab =cms.untracked.bool(True),`
-
 ## For CRAB submission
 
 ```bash
-cd <PATH_TO_CMSSW>/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/test
-cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/GenWeightsTableProducer.cc <PATH_TO_CMSSW>/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/plugins/
-
-scram b -j 8
-
-cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/nano_cff.py <PATH_TO_CMSSW>/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/python/
+cd ~/submitTopNanoAOD/CMSSW_10_2_18/src/PhysicsTools/NanoAOD/test
 cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/nano*_cfg.py .
 cp -p /afs/cern.ch/work/m/mullerd/public/priv_nAOD/crabSubmit.py .
 ```
@@ -85,6 +35,7 @@ Update the following parameters in crabSubmit.py:
 - `config.JobType.psetName` and `config.Data.outputDatasetTag` (X=6, 7 or 8 but the same in both entries)
 - `config.Site.storageSite`: your storage element
 - `config.Data.outLFNDirBase`: path of your storage element
+- `config.Data.inputDataset`: miniAOD to be preocessed
 
 ## Troubleshooting
 
